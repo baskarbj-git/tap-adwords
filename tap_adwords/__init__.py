@@ -188,6 +188,8 @@ def request_xsd(url):
     return resp.text
 
 def add_synthetic_keys_to_stream_schema(stream_schema):
+    stream_schema['properties']['_sdc_sequence'] = {'description': 'SDC Sequence',
+                                                       'type': 'integer'}
     stream_schema['properties']['_sdc_customer_id'] = {'description': 'Profile ID',
                                                        'type': 'string',
                                                        'field': "customer_id"}
@@ -352,6 +354,7 @@ def sync_report_for_day(stream_name, stream_schema, sdk_client, start, field_lis
                 obj = dict(zip(get_xml_attribute_headers(stream_schema, headers), row))
                 obj['_sdc_customer_id'] = customer_id
                 obj['_sdc_report_datetime'] = REPORT_RUN_DATETIME
+                obj['_sdc_sequence'] = counter.value
 
                 bumble_bee.pre_hook = transform_pre_hook
                 obj = bumble_bee.transform(obj, stream_schema)
